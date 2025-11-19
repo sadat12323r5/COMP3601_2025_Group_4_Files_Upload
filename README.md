@@ -89,14 +89,14 @@ For development details, tests, or to reproduce the demo, open the `Hardware/` a
 ```mermaid
 graph TD
   SD[SD Card]
-  E[e.wav (reference)]
-  S[shifted.wav (output)]
-  PS[Processing System (ARM Cortex-A53)]
+  E[e.wav]
+  S[shifted.wav]
+  PS[Processing System]
   A3[Pitch Detection]
   A4[Pitch Shifting Engine]
-  Mic[(I2S MEMS Microphone)]
-  Speaker[(Speaker Output)]
-  RX[I2S Receiver (SPH0645)]
+  Mic[I2S MEMS Microphone]
+  Speaker[Speaker Output]
+  RX[I2S Receiver]
   FIFO_IN[Input FIFO]
   DMA_S2MM[AXI DMA S2MM]
   DMA_MM2S[AXI DMA MM2S]
@@ -112,6 +112,7 @@ graph TD
   A3 --> A4
   A4 --> S
 ```
+
 
 
 
