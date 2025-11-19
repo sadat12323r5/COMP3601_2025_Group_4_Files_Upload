@@ -84,10 +84,7 @@ Educational use only — COMP3601 coursework.
 
 ### Contact / Next steps
 
-For development details, tests, or to reproduce the demo, open the `Hardware/` and `Software/` folders. If you want, I can also:
-
-- add a short `CONTRIBUTING.md` or `BUILD.md` with step-by-step build/flash instructions
-- extract exact build commands from `Software/` and add them to this README
+For development details, tests, or to reproduce the demo, open the `Hardware/` and `Software/` folders.
 
 ```mermaid
 flowchart TD
@@ -130,5 +127,3 @@ flowchart TD
     E --> A3
     A4 --> S
     A4 --> A5
-
-
