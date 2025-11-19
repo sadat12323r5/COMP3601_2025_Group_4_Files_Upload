@@ -87,52 +87,52 @@ Educational use only — COMP3601 coursework.
 For development details, tests, or to reproduce the demo, open the `Hardware/` and `Software/` folders.
 
 ```mermaid
-flowchart LR
+flowchart TB
 
-  %% ============ Programmable Logic ============
+%% ======================= TOP: Programmable Logic =======================
 
-  subgraph PL[Programmable logic]
+subgraph PL[Programmable logic]
 
-    %% Audio pipeline (mic side)
-    MicI2S[Mic I2S data BCLK LR]
-    I2SMaster[I2S master]
-    MicPCM[PCM samples from mic]
-    MicFIFO[Mics FIFO]
-    DSP[DSP 4 tap symmetric FIR]
-    DMA_S2MM[DMA S2MM to processing system]
-
-    MicI2S --> I2SMaster --> MicPCM --> MicFIFO --> DSP --> DMA_S2MM
-
-    %% Amplifier pipeline (speaker side)
-    SpkI2S[I2S TX to speaker]
-    SpkPCM[PCM samples to speaker]
-    SpkFIFO[Speaker FIFO]
-    AXIStream[AXI stream bus]
-    DMA_MM2S[DMA MM2S from processing system]
-
-    DMA_MM2S --> AXIStream --> SpkFIFO --> SpkPCM --> SpkI2S
-
+  %% --- Audio pipeline (top row) ---
+  subgraph AudioPipeline[Audio pipeline]
+    MicI2S[Mic I2S data BCLK LR] --> I2SMaster[I2S master]
+    I2SMaster --> MicPCM[PCM samples]
+    MicPCM --> MicFIFO[Mic FIFO]
+    MicFIFO --> DSP[DSP 4 tap symmetric FIR]
+    DSP --> DMA_S2MM[DMA S2MM to processing system]
   end
 
-  %% ============ Processing System ============
-
-  subgraph PS[Processing system]
-
-    Step1[Convert PCM to WAV]
-    Step2[Save to SD as REC WAV]
-    Step3[Detect pitch]
-    Step4[Shift to match E WAV]
-    Step5[Send shifted audio to speaker]
-
-    Step1 --> Step2 --> Step3 --> Step4 --> Step5
-
+  %% --- Amplifier pipeline (bottom row) ---
+  subgraph AmplifierPipeline[Amplifier pipeline]
+    DMA_MM2S[DMA MM2S from processing system] --> AXIStream[AXI stream bus]
+    AXIStream --> SpkFIFO[Speaker FIFO]
+    SpkFIFO --> SpkPCM[PCM to speaker]
+    SpkPCM --> SpkI2S[I2S TX to speaker]
   end
 
-  %% ============ Cross-block connections ============
+end
 
-  DMA_S2MM --> Step1
-  Step5 --> DMA_MM2S
+
+%% ======================= MIDDLE: Processing System =======================
+
+subgraph PS[Processing system]
+
+  Step1[Convert PCM to WAV]
+  Step2[Save to SD as REC WAV]
+  Step3[Detect pitch]
+  Step4[Shift to match E WAV]
+  Step5[Send shifted audio to speaker]
+
+  Step1 --> Step2 --> Step3 --> Step4 --> Step5
+end
+
+
+%% ======================= CROSS-BLOCK CONNECTIONS =======================
+
+DMA_S2MM --> Step1
+Step5 --> DMA_MM2S
 ```
+
 
 
 
