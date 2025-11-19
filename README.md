@@ -88,38 +88,37 @@ For development details, tests, or to reproduce the demo, open the `Hardware/` a
 
 ```mermaid
 flowchart TD
+    SD[SD Card]
+    E[e.wav (reference)]
+    S[shifted.wav (output)]
 
-    subgraph SD[SD Card]
-        E[e.wav (SQE)]
-        S[shifted.wav (output)]
-    end
-
-    subgraph PS[Processing System]
-        A1[DMA S2MM Handler]
-        A2[WAV Writer (FatFs)]
-        A3[Pitch Detection]
-        A4[Pitch Shifting Engine]
-        A5[DMA MM2S Streamer]
-    end
-
-    subgraph PL[Programmable Logic]
-        RX[I2S Receiver (SPH0645)]
-        FIFO_IN[Input FIFO]
-        DMA_S2MM[AXI DMA S2MM]
-        DMA_MM2S[AXI DMA MM2S]
-        FIFO_OUT[Output FIFO]
-        TX[I2S Transmitter]
-        AMP[MAX98357A I2S Amplifier]
-    end
+    PS[Processing System (ARM Cortex-A53)]
+    A3[Pitch Detection]
+    A4[Pitch Shifting Engine]
 
     Mic[(I2S MEMS Microphone)]
     Speaker[(Speaker Output)]
 
+    RX[I2S Receiver (SPH0645)]
+    FIFO_IN[Input FIFO]
+    DMA_S2MM[AXI DMA S2MM]
+
+    DMA_MM2S[AXI DMA MM2S]
+    FIFO_OUT[Output FIFO]
+    TX[I2S Transmitter]
+    AMP[MAX98357A I2S Amplifier]
+
+    %% Mic → PL → PS
     Mic -->|I2S: DOUT, BCLK, LRCLK| RX --> FIFO_IN --> DMA_S2MM --> PS
 
+    %% PS → PL → Speaker
     PS -->|Processed PCM| DMA_MM2S --> FIFO_OUT --> TX --> AMP --> Speaker
 
+    %% SD card + processing links
+    SD --> E
+    SD --> S
     E --> A3
+    A3 --> A4
     A4 --> S
-    A4 --> A5
+
 
