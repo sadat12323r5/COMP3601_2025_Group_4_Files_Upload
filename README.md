@@ -92,13 +92,11 @@ For development details, tests, or to reproduce the demo, open the `Hardware/` a
 ```mermaid
 flowchart TD
 
-    %% --- SD Card ---
     subgraph SD
         E[e.wav (reference)]
         S[shifted.wav (output)]
     end
 
-    %% --- Processing System ---
     subgraph PS
         A1[DMA S2MM Handler]
         A2[WAV Writer (FatFs)]
@@ -107,9 +105,7 @@ flowchart TD
         A5[DMA MM2S Streamer]
     end
 
-    %% --- Programmable Logic ---
     subgraph PL
-
         subgraph INPUT
             RX[I2S Receiver (SPH0645)]
             FIFO_IN[Input FIFO]
@@ -122,14 +118,11 @@ flowchart TD
             TX[I2S Transmitter]
             AMP[MAX98357A I2S Amplifier]
         end
-
     end
 
-    %% --- External Hardware ---
     Mic[(I2S MEMS Microphone)]
     Speaker[(Speaker Output)]
 
-    %% --- Connections ---
     Mic -->|I2S: DOUT, BCLK, LRCLK| RX --> FIFO_IN --> DMA_S2MM --> PS
 
     PS -->|Processed PCM| DMA_MM2S --> FIFO_OUT --> TX --> AMP --> Speaker
@@ -137,3 +130,5 @@ flowchart TD
     E --> A3
     A4 --> S
     A4 --> A5
+
+
