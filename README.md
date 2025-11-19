@@ -87,30 +87,13 @@ Educational use only — COMP3601 coursework.
 For development details, tests, or to reproduce the demo, open the `Hardware/` and `Software/` folders.
 
 ```mermaid
-graph TD
-  SD[SD Card]
-  E[e.wav (reference)]
-  S[shifted.wav (output)]
-  PS[Processing System (ARM Cortex-A53)]
-  A3[Pitch Detection]
-  A4[Pitch Shifting Engine]
-  Mic[(I2S MEMS Microphone)]
-  Speaker[(Speaker Output)]
-  RX[I2S Receiver (SPH0645)]
-  FIFO_IN[Input FIFO]
-  DMA_S2MM[AXI DMA S2MM]
-  DMA_MM2S[AXI DMA MM2S]
-  FIFO_OUT[Output FIFO]
-  TX[I2S Transmitter]
-  AMP[MAX98357A I2S Amplifier]
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
 
-  Mic -->|I2S: DOUT, BCLK, LRCLK| RX --> FIFO_IN --> DMA_S2MM --> PS
-  PS -->|Processed PCM| DMA_MM2S --> FIFO_OUT --> TX --> AMP --> Speaker
-  SD --> E
-  SD --> S
-  E --> A3
-  A3 --> A4
-  A4 --> S
 
 
 
