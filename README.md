@@ -87,31 +87,53 @@ Educational use only — COMP3601 coursework.
 For development details, tests, or to reproduce the demo, open the `Hardware/` and `Software/` folders.
 
 ```mermaid
-graph TD
-  SD[SD Card]
-  E[e.wav]
-  S[shifted.wav]
-  PS[Processing System]
-  A3[Pitch Detection]
-  A4[Pitch Shifting Engine]
-  Mic[I2S MEMS Microphone]
-  Speaker[Speaker Output]
-  RX[I2S Receiver]
-  FIFO_IN[Input FIFO]
-  DMA_S2MM[AXI DMA S2MM]
-  DMA_MM2S[AXI DMA MM2S]
-  FIFO_OUT[Output FIFO]
-  TX[I2S Transmitter]
-  AMP[MAX98357A I2S Amplifier]
+flowchart LR
 
-  Mic -->|I2S: DOUT, BCLK, LRCLK| RX --> FIFO_IN --> DMA_S2MM --> PS
-  PS -->|Processed PCM| DMA_MM2S --> FIFO_OUT --> TX --> AMP --> Speaker
-  SD --> E
-  SD --> S
-  E --> A3
-  A3 --> A4
-  A4 --> S
+  %% ============ Programmable Logic ============
+
+  subgraph PL[Programmable logic]
+
+    %% Audio pipeline (mic side)
+    MicI2S[Mic I2S data BCLK LR]
+    I2SMaster[I2S master]
+    MicPCM[PCM samples from mic]
+    MicFIFO[Mics FIFO]
+    DSP[DSP 4 tap symmetric FIR]
+    DMA_S2MM[DMA S2MM to processing system]
+
+    MicI2S --> I2SMaster --> MicPCM --> MicFIFO --> DSP --> DMA_S2MM
+
+    %% Amplifier pipeline (speaker side)
+    SpkI2S[I2S TX to speaker]
+    SpkPCM[PCM samples to speaker]
+    SpkFIFO[Speaker FIFO]
+    AXIStream[AXI stream bus]
+    DMA_MM2S[DMA MM2S from processing system]
+
+    DMA_MM2S --> AXIStream --> SpkFIFO --> SpkPCM --> SpkI2S
+
+  end
+
+  %% ============ Processing System ============
+
+  subgraph PS[Processing system]
+
+    Step1[Convert PCM to WAV]
+    Step2[Save to SD as REC WAV]
+    Step3[Detect pitch]
+    Step4[Shift to match E WAV]
+    Step5[Send shifted audio to speaker]
+
+    Step1 --> Step2 --> Step3 --> Step4 --> Step5
+
+  end
+
+  %% ============ Cross-block connections ============
+
+  DMA_S2MM --> Step1
+  Step5 --> DMA_MM2S
 ```
+
 
 
 
