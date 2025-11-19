@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="audio_tuner" location="C:/unswworks/workspace/audio_tuner" platform="/home/cse/Desktop/BB_Software/kv260_lab3_platform/export/kv260_lab3_platform/kv260_lab3_platform.xpfm" platformUID="xilinx:kv260_som::0.0(custom)" systemProject="audio_tuner_system" sysConfig="kv260_lab3_platform" runtime="C/C++" cpu="standalone_domain" cpuInstance="psu_cortexa53_0" os="standalone" mssSignature="363087244e51cd05c80d776e3ad2f95f">
+  <configuration name="Debug" id="xilinx.gnu.arm.a53.exe.debug.700061462">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+    <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <configuration name="Release" id="xilinx.gnu.arm.a53.exe.release.994442627" dirty="true">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <template appTemplateName="hello_world"/>
+</sdkproject:SdkProject>
