@@ -90,7 +90,7 @@ For development details, tests, or to reproduce the demo, open the `Hardware/` a
 flowchart TD
 
     subgraph SD[SD Card]
-        E[e.wav (reference)]
+        E[e.wav (SQE)]
         S[shifted.wav (output)]
     end
 
@@ -122,3 +122,4 @@ flowchart TD
     E --> A3
     A4 --> S
     A4 --> A5
+
