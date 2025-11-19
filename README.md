@@ -89,6 +89,7 @@ For development details, tests, or to reproduce the demo, open the `Hardware/` a
 - add a short `CONTRIBUTING.md` or `BUILD.md` with step-by-step build/flash instructions
 - extract exact build commands from `Software/` and add them to this README
 
+```mermaid
 flowchart TD
 
     subgraph SD[SD Card (SD1)]
