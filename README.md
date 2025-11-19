@@ -87,53 +87,32 @@ Educational use only — COMP3601 coursework.
 For development details, tests, or to reproduce the demo, open the `Hardware/` and `Software/` folders.
 
 ```mermaid
-flowchart LR
+graph TD
+  SD[SD Card]
+  E[e.wav (reference)]
+  S[shifted.wav (output)]
+  PS[Processing System (ARM Cortex-A53)]
+  A3[Pitch Detection]
+  A4[Pitch Shifting Engine]
+  Mic[(I2S MEMS Microphone)]
+  Speaker[(Speaker Output)]
+  RX[I2S Receiver (SPH0645)]
+  FIFO_IN[Input FIFO]
+  DMA_S2MM[AXI DMA S2MM]
+  DMA_MM2S[AXI DMA MM2S]
+  FIFO_OUT[Output FIFO]
+  TX[I2S Transmitter]
+  AMP[MAX98357A I2S Amplifier]
 
-    %% ====== STYLES ======
-    classDef block fill:#2b2b2b,stroke:#888,stroke-width:1px,rx:6px,ry:6px,color:#fff;
-    classDef node fill:#3a3a3a,stroke:#666,stroke-width:1px,rx:4px,ry:4px,color:#fff;
-
-    %% ====== BLOCKS ======
-
-    subgraph SD[SD Card]
-        E[e.wav (reference)]
-        S[shifted.wav (output)]
-        class E,S node;
-    end
-    class SD block;
-
-    subgraph PS[Processing System (ARM Cortex-A53)]
-        A1[WAV Writer (FatFs)]
-        A2[Pitch Detection]
-        A3[Pitch Shifting]
-        class A1,A2,A3 node;
-    end
-    class PS block;
-
-    subgraph PL[Programmable Logic (FPGA Fabric)]
-        RX[I2S Receiver (Mic)]
-        FIFO_IN[Input FIFO]
-        DMA_S2MM[DMA S2MM]
-        DMA_MM2S[DMA MM2S]
-        FIFO_OUT[Output FIFO]
-        TX[I2S Transmitter]
-        AMP[MAX98357A Amplifier]
-        class RX,FIFO_IN,DMA_S2MM,DMA_MM2S,FIFO_OUT,TX,AMP node;
-    end
-    class PL block;
-
-    Mic((Mic))
-    Speaker((Speaker))
-
-    %% ====== CONNECTIONS ======
-
-    Mic --> RX --> FIFO_IN --> DMA_S2MM --> PS
-    PS --> DMA_MM2S --> FIFO_OUT --> TX --> AMP --> Speaker
-
-    SD --> E --> A2
-    A3 --> S
-
+  Mic -->|I2S: DOUT, BCLK, LRCLK| RX --> FIFO_IN --> DMA_S2MM --> PS
+  PS -->|Processed PCM| DMA_MM2S --> FIFO_OUT --> TX --> AMP --> Speaker
+  SD --> E
+  SD --> S
+  E --> A3
+  A3 --> A4
+  A4 --> S
 ```
+
 
 
 
