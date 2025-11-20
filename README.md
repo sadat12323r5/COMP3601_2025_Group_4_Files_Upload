@@ -269,7 +269,7 @@ subgraph PL[Programmable logic]
   subgraph AmplifierPipeline[Amplifier pipeline]
     DMA_MM2S[DMA MM2S from processing system] --> AXIStream[AXI stream bus]
     AXIStream --> SpkFIFO[Speaker FIFO]
-    SpkFIFO --> SpkPCM[PCM to speaker]
+    SpkFIFO --> SpkPCM[PCM to I2S TX]
     SpkPCM --> SpkI2S[I2S TX to speaker]
   end
 
@@ -342,6 +342,7 @@ Importantly, the envelope follower did not fail; it produced correct amplitude t
 These modules are included under supporting_resources/DSP_Hardware/ for future refinement. With correct tuning, the FPGA-side DSP can become part of a complete effects chain alongside the pitch-shifting system.
 
 The writing of this file has been assisted by copilot.
+
 
 
 
