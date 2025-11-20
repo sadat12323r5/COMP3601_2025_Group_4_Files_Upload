@@ -15,7 +15,6 @@ entity i2s_master is
     generic (
         DATA_WIDTH : natural := 32;
         PCM_PRECISION : natural := 18;
-        BCLK_DIV_CMP  : natural := 15
     );
     port (
         clk             : in  std_logic;
@@ -69,7 +68,7 @@ begin
     begin
         if rising_edge(clk) then
             -- Increment bclk divider
-            if bclk_divider < BCLK_DIV_CMP then
+            if bclk_divider < 15 then
                 bclk_divider <= bclk_divider + 1;
             else
                 bclk_divider <= 0;

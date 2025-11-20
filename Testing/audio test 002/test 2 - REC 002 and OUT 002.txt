@@ -1,0 +1,20 @@
+test 2 - REC 002 and OUT 002
+
+A steady tone was recorded using the I²S microphone, processed through the FPGA pitch-shift pipeline, and written to SD. MATLAB analysis showed:
+
+Original dominant frequency: ~316.41 Hz
+
+Shifted dominant frequency: ~339.4 Hz
+
+Pitch ratio: 1.074
+
+Semitone change: +1.024 semitones (downward)
+
+SNR and THD remained stable(SNR and THD essentially remained unchanged, meaning there is little distortion and the pitch shifting algorithm preserves audio quality)
+
+SNR: 27.02 dB → 27.83 dB
+
+THD: –24.00 dB → –24.23 dB
+
+Audacity waveform and spectral analysis confirmed a clear upward shift in pitch while maintaining signal clarity.
+Conclusion: The pipeline correctly applied an upward pitch modification, again with minimal noise or distortion added.

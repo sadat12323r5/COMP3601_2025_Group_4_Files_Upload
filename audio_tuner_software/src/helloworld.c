@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 /*
- * helloworld.c: simple test application
+ * helloworld.c: simple test application that was modified for our audio retuning application.
  *
  * This application configures UART 16550 to baud rate 9600.
  * PS7 UART (Zynq) is not initialized by this application, since
@@ -24,6 +24,20 @@
  * Simple audio capture to WAV on SD1 using FatFs and AXI DMA (S2MM).
  * - Uses drive "1:" explicitly
  * - Writes 16-bit PCM WAV
+    * - Assumes mono I2S mic input at 48kHz
+    * - Press SW1 to start recording
+    * - Saves to rec.wav on SD1
+ * - Implements pitch detection using Yin algorithm
+    * - Performs pitch shifting using phase vocoder
+    * - Saves shifted audio to out.wav on SD1
+ * - Indicates state using LED:
+    * - OFF: Ready
+    * - ON: Press SW1 to start recording
+    * - OFF: Recording
+    * - SLOW BLINK: Pitch detection
+    * - MEDIUM BLINK: Phase vocoder processing
+    * - DOUBLE BLINK: Complete!
+ * - Drives the speaker with the shifted audio
  */
 
 #include "xaxidma.h"
@@ -57,7 +71,7 @@
 #define BYTES_PER_SAMPLE        4          // PL streams 32-bit words
 #define BURST_BYTES             (BURST_SAMPLES * BYTES_PER_SAMPLE)
 
-#define SECONDS_TO_RECORD       3  // Reduced from 7 to save memory for phase vocoder
+#define SECONDS_TO_RECORD       3  // can be changed as desired
 #define TOTAL_SAMPLES           (FS * SECONDS_TO_RECORD)
 
 /*** Globals ***/
@@ -185,27 +199,18 @@ static int sd_open_wav(FIL *fp, const char *filename,
     uint8_t hdr[44];
     char path[64];
 
-    xil_printf("unmount %s...\r\n", DRIVE);
     f_mount(NULL, DRIVE, 1);
-
-    xil_printf("mount %s...\r\n", DRIVE);
     fr = f_mount(&g_fs, DRIVE, 1);
-    xil_printf("f_mount -> %d\r\n", fr);
     if (fr != FR_OK) return -1;
 
     snprintf(path, sizeof(path), "%s/%s", DRIVE, filename);
-    xil_printf("f_open %s...\r\n", path);
     fr = f_open(fp, path, FA_CREATE_ALWAYS | FA_WRITE);
-    xil_printf("f_open -> %d\r\n", fr);
     if (fr != FR_OK) return -1;
 
     wav_header(hdr, nsamples, fs, bits, ch);
-    xil_printf("write header 44 bytes...\r\n");
     fr = f_write(fp, hdr, sizeof(hdr), &bw);
-    xil_printf("f_write hdr -> fr=%d bw=%u\r\n", fr, (unsigned)bw);
     if (fr != FR_OK || bw != sizeof(hdr)) { f_close(fp); return -1; }
 
-    xil_printf("header ok\r\n");
     return 0;
 }
 
@@ -248,7 +253,6 @@ static int detect_pitch_from_sd(const char *filename, int startSample, int numSa
     
     // Open the file from SD card
     snprintf(path, sizeof(path), "%s/%s", DRIVE, filename);
-    xil_printf("Opening %s for pitch detection...\r\n", path);
     
     fr = f_open(&fp, path, FA_READ);
     if (fr != FR_OK) {
@@ -1023,11 +1027,6 @@ int main(void)
 			f_lseek(&fplay, 44);
 			xil_printf("Playback starting...\r\n");
 
-			u32 first_sr_before = 0;
-			u32 first_sr_after  = 0;
-			int first_status    = 0;
-			int first_taken     = 0;   // boolean flag
-
 			while (1) {
 				if (f_read(&fplay, pcm16, BURST_SAMPLES * sizeof(int16_t), &br) != FR_OK ||
 						br == 0) break;
@@ -1049,21 +1048,9 @@ int main(void)
 														(UINTPTR)tx32,
 														tx_words * sizeof(uint32_t),
 														XAXIDMA_DMA_TO_DEVICE);
-
-					/* Only record the FIRST transfer's SR + status */
-					if (!first_taken) {
-						first_sr_before = XAxiDma_ReadReg(AxiDma.RegBase,
-														  XAXIDMA_TX_OFFSET + XAXIDMA_SR_OFFSET);
-						first_status    = status;
-
-						while (XAxiDma_Busy(&AxiDma, XAXIDMA_DMA_TO_DEVICE));
-
-						first_sr_after  = XAxiDma_ReadReg(AxiDma.RegBase,
-														  XAXIDMA_TX_OFFSET + XAXIDMA_SR_OFFSET);
-						first_taken = 1;
-					} else {
-						while (XAxiDma_Busy(&AxiDma, XAXIDMA_DMA_TO_DEVICE));
-					}
+			
+					while (XAxiDma_Busy(&AxiDma, XAXIDMA_DMA_TO_DEVICE));
+					
 
 					if (status != XST_SUCCESS) {
 						xil_printf("TX DMA transfer setup failed (%d)\r\n", status);
